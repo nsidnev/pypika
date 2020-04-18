@@ -25,11 +25,6 @@ from pypika.utils import (
     resolve_is_aggregate,
 )
 
-try:
-    basestring
-except NameError:
-    basestring = str
-
 __author__ = "Timothy Heys"
 __email__ = "theys@kayak.com"
 
@@ -296,7 +291,7 @@ class ValueWrapper(Term):
         if isinstance(self.value, date):
             value = self.value.isoformat()
             return format_quotes(value, quote_char)
-        if isinstance(self.value, basestring):
+        if isinstance(self.value, str):
             value = self.value.replace(quote_char, quote_char * 2)
             return format_quotes(value, quote_char)
         if isinstance(self.value, bool):
