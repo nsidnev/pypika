@@ -1,3 +1,5 @@
+from typing import Optional, List, Any, Type
+
 __author__ = "Timothy Heys"
 __email__ = "theys@kayak.com"
 
@@ -84,7 +86,7 @@ def ignore_copy(func):
     return _getattr
 
 
-def resolve_is_aggregate(values):
+def resolve_is_aggregate(values: List[Optional[bool]]) -> Optional[bool]:
     """
     Resolves the is_aggregate flag for an expression that contains multiple terms.  This works like a voter system,
     each term votes True or False or abstains with None.
@@ -99,11 +101,17 @@ def resolve_is_aggregate(values):
     return None
 
 
-def format_quotes(value, quote_char):
+def format_quotes(value: Any, quote_char: str) -> str:
     return "{quote}{value}{quote}".format(value=value, quote=quote_char or "")
 
 
-def format_alias_sql(sql, alias, quote_char=None, alias_quote_char=None, **kwargs):
+def format_alias_sql(
+    sql: str,
+    alias: Optional[str],
+    quote_char: Optional[str] = None,
+    alias_quote_char: Optional[str] = None,
+    **kwargs: Any
+) -> str:
     if alias is None:
         return sql
     return "{sql} {alias}".format(
@@ -111,7 +119,9 @@ def format_alias_sql(sql, alias, quote_char=None, alias_quote_char=None, **kwarg
     )
 
 
-def validate(*args, exc=None, type=None):
+def validate(
+    *args: Any, exc: Optional[Exception] = None, type: Optional[Type[Any]] = None
+):
     if type is not None:
         for arg in args:
             if not isinstance(arg, type):
