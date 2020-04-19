@@ -1,4 +1,4 @@
-from typing import Optional, List, Any, Type
+from typing import Optional, List, Any, Type, Callable
 
 __author__ = "Timothy Heys"
 __email__ = "theys@kayak.com"
@@ -36,7 +36,7 @@ class FunctionException(Exception):
     pass
 
 
-def builder(func):
+def builder(func: Callable) -> Callable:
     """
     Decorator for wrapper "builder" functions.  These are functions on the Query class or other classes used for
     building queries which mutate the query and return self.  To make the build functions immutable, this decorator is
@@ -59,7 +59,7 @@ def builder(func):
     return _copy
 
 
-def ignore_copy(func):
+def ignore_copy(func: Callable) -> Callable:
     """
     Decorator for wrapping the __getattr__ function for classes that are copied via deepcopy.  This prevents infinite
     recursion caused by deepcopy looking for magic functions in the class. Any class implementing __getattr__ that is
