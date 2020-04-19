@@ -54,7 +54,7 @@ class Node:
 
 
 class Term(Node):
-    is_aggregate: Optional[bool] = False
+    is_aggregate = False
 
     def __init__(self, alias: Optional[str] = None) -> None:
         self.alias = alias
@@ -617,7 +617,7 @@ class NestedCriterion(Criterion):
     def __init__(
         self,
         comparator: Comparator,
-        nested_comparator: ComplexCriterion,
+        nested_comparator: "ComplexCriterion",
         left: Any,
         right: Any,
         nested: Any,
@@ -714,7 +714,7 @@ class BasicCriterion(Criterion):
 
     @builder
     def replace_table(
-        self, current_table: Optional[Table], new_table: Optional[Table]
+        self, current_table: Optional["Table"], new_table: Optional["Table"]
     ) -> "BasicCriterion":
         """
         Replaces all occurrences of the specified table with the new table. Useful when reusing fields across queries.
@@ -785,7 +785,7 @@ class ContainsCriterion(Criterion):
         self.term = self.term.replace_table(current_table, new_table)
 
     def get_sql(self, subquery: Any = None, **kwargs: Any) -> str:
-        return "{term} {not_}IN {container}".format(
+        sql = "{term} {not_}IN {container}".format(
             term=self.term.get_sql(**kwargs),
             container=self.container.get_sql(subquery=True, **kwargs),
             not_="NOT " if self._is_negated else "",
@@ -870,7 +870,7 @@ class BitwiseAndCriterion(Criterion):
         self.term = self.term.replace_table(current_table, new_table)
 
     def get_sql(self, **kwargs: Any) -> str:
-        return "({term} & {value})".format(
+        sql = "({term} & {value})".format(
             term=self.term.get_sql(**kwargs), value=self.value,
         )
         return format_alias_sql(sql, self.alias, **kwargs)
@@ -1342,9 +1342,7 @@ EdgeT = TypeVar("EdgeT", bound="WindowFrameAnalyticFunction.Edge")
 
 class WindowFrameAnalyticFunction(AnalyticFunction):
     class Edge:
-        modifier: str
-
-        def __init__(self, value: Optional[str, int] = None) -> None:
+        def __init__(self, value: Optional[Union[str, int]] = None) -> None:
             self.value = value
 
         def __str__(self) -> str:
