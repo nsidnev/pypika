@@ -582,10 +582,11 @@ class QueryBuilder(Selectable, Term):
 
     def __init__(
         self,
-        dialect: Dialects = None,
+        dialect: Optional[Dialects] = None,
         wrap_union_queries: bool = True,
         wrapper_cls: Type[ValueWrapper] = ValueWrapper,
         immutable: bool = True,
+        as_keyword: bool = False,
     ):
         super().__init__(None)
 
@@ -626,6 +627,7 @@ class QueryBuilder(Selectable, Term):
         self._foreign_table = False
 
         self.dialect = dialect
+        self.as_keyword = as_keyword
         self.wrap_union_queries = wrap_union_queries
 
         self._wrapper_cls = wrapper_cls
@@ -1134,6 +1136,7 @@ class QueryBuilder(Selectable, Term):
         kwargs.setdefault("quote_char", self.QUOTE_CHAR)
         kwargs.setdefault("secondary_quote_char", self.SECONDARY_QUOTE_CHAR)
         kwargs.setdefault("alias_quote_char", self.ALIAS_QUOTE_CHAR)
+        kwargs.setdefault("as_keyword", self.as_keyword)
         kwargs.setdefault("dialect", self.dialect)
 
     def get_sql(

@@ -74,7 +74,7 @@ class Term(Node):
 
     @staticmethod
     def wrap_constant(
-            val: Any, wrapper_cls: Optional[Type["Term"]] = None
+        val: Any, wrapper_cls: Optional[Type["Term"]] = None
     ) -> Union[ValueError, NodeT, "NullValue", "Array", "Tuple", "ValueWrapper"]:
         """
         Used for wrapping raw inputs such as numbers in Criterions and Operator.
@@ -106,8 +106,8 @@ class Term(Node):
 
     @staticmethod
     def wrap_json(
-            val: Union["Term", "QueryBuilder", "Interval", None, str, int, bool],
-            wrapper_cls: Optional[float] = None,
+        val: Union["Term", "QueryBuilder", "Interval", None, str, int, bool],
+        wrapper_cls: Optional[float] = None,
     ) -> Union["Term", "QueryBuilder", "Interval", "NullValue", "ValueWrapper", "JSON"]:
         from .queries import QueryBuilder
 
@@ -121,7 +121,9 @@ class Term(Node):
 
         return JSON(val)
 
-    def replace_table(self, current_table: Optional["Table"], new_table: Optional["Table"]) -> "Term":
+    def replace_table(
+        self, current_table: Optional["Table"], new_table: Optional["Table"]
+    ) -> "Term":
         """
         Replaces all occurrences of the specified table with the new table. Useful when reusing fields across queries.
         The base implementation returns self because not all terms have a table property.
@@ -297,7 +299,7 @@ class Negative(Term):
 class ValueWrapper(Term):
     is_aggregate = None
 
-    def __init__(self, value: Any, alias: Optional[str] = None, ) -> None:
+    def __init__(self, value: Any, alias: Optional[str] = None,) -> None:
         super().__init__(alias)
         self.value = value
 
@@ -322,10 +324,10 @@ class ValueWrapper(Term):
         return str(self.value)
 
     def get_sql(
-            self,
-            quote_char: Optional[str] = None,
-            secondary_quote_char: str = "'",
-            **kwargs: Any
+        self,
+        quote_char: Optional[str] = None,
+        secondary_quote_char: str = "'",
+        **kwargs: Any
     ) -> str:
         sql = self.get_value_sql(
             quote_char=quote_char, secondary_quote_char=secondary_quote_char, **kwargs
@@ -471,10 +473,10 @@ class EmptyCriterion:
 
 class Field(Criterion, JSON):
     def __init__(
-            self,
-            name: str,
-            alias: Optional[str] = None,
-            table: Optional[Union[str, 'Selectable']] = None,
+        self,
+        name: str,
+        alias: Optional[str] = None,
+        table: Optional[Union[str, "Selectable"]] = None,
     ) -> None:
         super().__init__(alias)
         self.name = name
@@ -486,7 +488,9 @@ class Field(Criterion, JSON):
             yield from self.table.nodes_()
 
     @builder
-    def replace_table(self, current_table: Optional["Table"], new_table: Optional["Table"]) -> "Field":
+    def replace_table(
+        self, current_table: Optional["Table"], new_table: Optional["Table"]
+    ) -> "Field":
         """
         Replaces all occurrences of the specified table with the new table. Useful when reusing fields across queries.
 
@@ -532,7 +536,7 @@ class Index(Term):
 
 
 class Star(Field):
-    def __init__(self, table: Optional[Union[str, 'Selectable']] = None) -> None:
+    def __init__(self, table: Optional[Union[str, "Selectable"]] = None) -> None:
         super().__init__("*", table=table)
 
     def nodes_(self) -> Iterator[NodeT]:
@@ -541,11 +545,11 @@ class Star(Field):
             yield from self.table.nodes_()
 
     def get_sql(
-            self,
-            with_alias: bool = False,
-            with_namespace: bool = False,
-            quote_char: Optional[str] = None,
-            **kwargs: Any
+        self,
+        with_alias: bool = False,
+        with_namespace: bool = False,
+        quote_char: Optional[str] = None,
+        **kwargs: Any
     ) -> str:
         if self.table and (with_namespace or self.table.alias):
             namespace = self.table.alias or getattr(self.table, "_table_name")
@@ -573,7 +577,9 @@ class Tuple(Criterion):
         return all([value.is_aggregate for value in self.values])
 
     @builder
-    def replace_table(self, current_table: Optional["Table"], new_table: Optional["Table"]) -> "Tuple":
+    def replace_table(
+        self, current_table: Optional["Table"], new_table: Optional["Table"]
+    ) -> "Tuple":
         """
         Replaces all occurrences of the specified table with the new table. Useful when reusing fields across queries.
 
@@ -609,13 +615,13 @@ class Bracket(Tuple):
 
 class NestedCriterion(Criterion):
     def __init__(
-            self,
-            comparator: Comparator,
-            nested_comparator: ComplexCriterion,
-            left: Any,
-            right: Any,
-            nested: Any,
-            alias: Optional[str] = None,
+        self,
+        comparator: Comparator,
+        nested_comparator: ComplexCriterion,
+        left: Any,
+        right: Any,
+        nested: Any,
+        alias: Optional[str] = None,
     ) -> None:
         super().__init__(alias)
         self.left = left
@@ -638,7 +644,7 @@ class NestedCriterion(Criterion):
 
     @builder
     def replace_table(
-            self, current_table: Optional["Table"], new_table: Optional["Table"]
+        self, current_table: Optional["Table"], new_table: Optional["Table"]
     ) -> "NestedCriterion":
         """
         Replaces all occurrences of the specified table with the new table. Useful when reusing fields across queries.
@@ -671,8 +677,11 @@ class NestedCriterion(Criterion):
 
 class BasicCriterion(Criterion):
     def __init__(
-            self, comparator: Comparator, left: Term, right: Term,
-            alias: Optional[str] = None
+        self,
+        comparator: Comparator,
+        left: Term,
+        right: Term,
+        alias: Optional[str] = None,
     ) -> None:
         """
         A wrapper for a basic criterion such as equality or inequality. This wraps three parts, a left and right term
@@ -704,7 +713,9 @@ class BasicCriterion(Criterion):
         )
 
     @builder
-    def replace_table(self, current_table: Optional[Table], new_table: Optional[Table]) -> "BasicCriterion":
+    def replace_table(
+        self, current_table: Optional[Table], new_table: Optional[Table]
+    ) -> "BasicCriterion":
         """
         Replaces all occurrences of the specified table with the new table. Useful when reusing fields across queries.
 
@@ -719,16 +730,15 @@ class BasicCriterion(Criterion):
         self.right = self.right.replace_table(current_table, new_table)
 
     def get_sql(
-            self, quote_char: str = '"', with_alias: bool = False, **kwargs: Any
+        self, quote_char: str = '"', with_alias: bool = False, **kwargs: Any
     ) -> str:
         sql = "{left}{comparator}{right}".format(
             comparator=self.comparator.value,
             left=self.left.get_sql(quote_char=quote_char, **kwargs),
             right=self.right.get_sql(quote_char=quote_char, **kwargs),
         )
-        if with_alias and self.alias:
-            return '{sql} "{alias}"'.format(sql=sql, alias=self.alias)
-
+        if with_alias:
+            return format_alias_sql(sql, self.alias, **kwargs)
         return sql
 
 
@@ -760,7 +770,7 @@ class ContainsCriterion(Criterion):
 
     @builder
     def replace_table(
-            self, current_table: Optional["Table"], new_table: Optional["Table"]
+        self, current_table: Optional["Table"], new_table: Optional["Table"]
     ) -> "ContainsCriterion":
         """
         Replaces all occurrences of the specified table with the new table. Useful when reusing fields across queries.
@@ -780,6 +790,7 @@ class ContainsCriterion(Criterion):
             container=self.container.get_sql(subquery=True, **kwargs),
             not_="NOT " if self._is_negated else "",
         )
+        return format_alias_sql(sql, self.alias, **kwargs)
 
     @builder
     def negate(self) -> "ContainsCriterion":
@@ -788,7 +799,7 @@ class ContainsCriterion(Criterion):
 
 class BetweenCriterion(Criterion):
     def __init__(
-            self, term: Term, start: Any, end: Any, alias: Optional[str] = None
+        self, term: Term, start: Any, end: Any, alias: Optional[str] = None
     ) -> str:
         super().__init__(alias)
         self.term = term
@@ -807,7 +818,7 @@ class BetweenCriterion(Criterion):
 
     @builder
     def replace_table(
-            self, current_table: Optional["Table"], new_table: Optional["Table"]
+        self, current_table: Optional["Table"], new_table: Optional["Table"]
     ) -> "BetweenCriterion":
         """
         Replaces all occurrences of the specified table with the new table. Useful when reusing fields across queries.
@@ -823,11 +834,12 @@ class BetweenCriterion(Criterion):
 
     def get_sql(self, **kwargs: Any) -> str:
         # FIXME escape
-        return "{term} BETWEEN {start} AND {end}".format(
+        sql = "{term} BETWEEN {start} AND {end}".format(
             term=self.term.get_sql(**kwargs),
             start=self.start.get_sql(**kwargs),
             end=self.end.get_sql(**kwargs),
         )
+        return format_alias_sql(sql, self.alias, **kwargs)
 
 
 class BitwiseAndCriterion(Criterion):
@@ -843,7 +855,7 @@ class BitwiseAndCriterion(Criterion):
 
     @builder
     def replace_table(
-            self, current_table: Optional["Table"], new_table: Optional["Table"]
+        self, current_table: Optional["Table"], new_table: Optional["Table"]
     ) -> "BitwiseAndCriterion":
         """
         Replaces all occurrences of the specified table with the new table. Useful when reusing fields across queries.
@@ -861,6 +873,7 @@ class BitwiseAndCriterion(Criterion):
         return "({term} & {value})".format(
             term=self.term.get_sql(**kwargs), value=self.value,
         )
+        return format_alias_sql(sql, self.alias, **kwargs)
 
 
 class NullCriterion(Criterion):
@@ -873,7 +886,9 @@ class NullCriterion(Criterion):
         yield from self.term.nodes_()
 
     @builder
-    def replace_table(self, current_table: Optional["Table"], new_table: Optional["Table"]) -> "NullCriterion":
+    def replace_table(
+        self, current_table: Optional["Table"], new_table: Optional["Table"]
+    ) -> "NullCriterion":
         """
         Replaces all occurrences of the specified table with the new table. Useful when reusing fields across queries.
 
@@ -886,8 +901,9 @@ class NullCriterion(Criterion):
         """
         self.term = self.term.replace_table(current_table, new_table)
 
-    def get_sql(self, **kwargs: Any) -> str:
-        return "{term} IS NULL".format(term=self.term.get_sql(**kwargs), )
+    def get_sql(self, with_alias: bool = False, **kwargs: Any) -> str:
+        sql = "{term} IS NULL".format(term=self.term.get_sql(**kwargs),)
+        return format_alias_sql(sql, self.alias, **kwargs)
 
 
 class ComplexCriterion(BasicCriterion):
@@ -909,8 +925,8 @@ class ComplexCriterion(BasicCriterion):
 
     def needs_brackets(self, term: Term) -> bool:
         return (
-                isinstance(term, ComplexCriterion)
-                and not term.comparator == self.comparator
+            isinstance(term, ComplexCriterion)
+            and not term.comparator == self.comparator
         )
 
 
@@ -924,8 +940,7 @@ class ArithmeticExpression(Term):
     add_order = [Arithmetic.add, Arithmetic.sub]
 
     def __init__(
-            self, operator: Arithmetic, left: Any, right: Any,
-            alias: Optional[str] = None
+        self, operator: Arithmetic, left: Any, right: Any, alias: Optional[str] = None
     ) -> None:
         """
         Wrapper for an arithmetic expression.
@@ -959,7 +974,7 @@ class ArithmeticExpression(Term):
 
     @builder
     def replace_table(
-            self, current_table: Optional["Table"], new_table: Optional["Table"]
+        self, current_table: Optional["Table"], new_table: Optional["Table"]
     ) -> "ArithmeticExpression":
         """
         Replaces all occurrences of the specified table with the new table. Useful when reusing fields across queries.
@@ -1026,7 +1041,9 @@ class Case(Term):
         self._cases.append((criterion, self.wrap_constant(term)))
 
     @builder
-    def replace_table(self, current_table: Optional["Table"], new_table: Optional["Table"]) -> "Case":
+    def replace_table(
+        self, current_table: Optional["Table"], new_table: Optional["Table"]
+    ) -> "Case":
         """
         Replaces all occurrences of the specified table with the new table. Useful when reusing fields across queries.
 
@@ -1109,7 +1126,9 @@ class Not(Criterion):
         return inner
 
     @builder
-    def replace_table(self, current_table: Optional["Table"], new_table: Optional["Table"]) -> "Not":
+    def replace_table(
+        self, current_table: Optional["Table"], new_table: Optional["Table"]
+    ) -> "Not":
         """
         Replaces all occurrences of the specified table with the new table. Useful when reusing fields across queries.
 
@@ -1173,7 +1192,9 @@ class Function(Criterion):
         return len(self.args) == 1 and self.args[0].is_aggregate
 
     @builder
-    def replace_table(self, current_table: Optional["Table"], new_table: Optional["Table"]) -> "Function":
+    def replace_table(
+        self, current_table: Optional["Table"], new_table: Optional["Table"]
+    ) -> "Function":
         """
         Replaces all occurrences of the specified table with the new table. Useful when reusing fields across queries.
 
@@ -1263,7 +1284,7 @@ class AnalyticFunction(Function):
         self._orderbys += [(term, kwargs.get("order")) for term in terms]
 
     def _orderby_field(
-            self, field: Field, orient: Optional[Order], **kwargs: Any
+        self, field: Field, orient: Optional[Order], **kwargs: Any
     ) -> str:
         if orient is None:
             return field.get_sql(**kwargs)
@@ -1337,7 +1358,7 @@ class WindowFrameAnalyticFunction(AnalyticFunction):
         self.bound = None
 
     def _set_frame_and_bounds(
-            self, frame: str, bound: str, and_bound: Optional[EdgeT]
+        self, frame: str, bound: str, and_bound: Optional[EdgeT]
     ) -> None:
         if self.frame or self.bound:
             raise AttributeError()
@@ -1347,13 +1368,13 @@ class WindowFrameAnalyticFunction(AnalyticFunction):
 
     @builder
     def rows(
-            self, bound: Union[str, EdgeT], and_bound: Optional[EdgeT] = None
+        self, bound: Union[str, EdgeT], and_bound: Optional[EdgeT] = None
     ) -> "WindowFrameAnalyticFunction":
         self._set_frame_and_bounds("ROWS", bound, and_bound)
 
     @builder
     def range(
-            self, bound: Union[str, EdgeT], and_bound: Optional[EdgeT] = None
+        self, bound: Union[str, EdgeT], and_bound: Optional[EdgeT] = None
     ) -> "WindowFrameAnalyticFunction":
         self._set_frame_and_bounds("RANGE", bound, and_bound)
 
@@ -1412,17 +1433,17 @@ class Interval(Node):
     trim_pattern = re.compile(r"(^0+\.)|(\.0+$)|(^[0\-.: ]+[\-: ])|([\-:. ][0\-.: ]+$)")
 
     def __init__(
-            self,
-            years: int = 0,
-            months: int = 0,
-            days: int = 0,
-            hours: int = 0,
-            minutes: int = 0,
-            seconds: int = 0,
-            microseconds: int = 0,
-            quarters: int = 0,
-            weeks: int = 0,
-            dialect: Optional[Dialects] = None,
+        self,
+        years: int = 0,
+        months: int = 0,
+        days: int = 0,
+        hours: int = 0,
+        minutes: int = 0,
+        seconds: int = 0,
+        microseconds: int = 0,
+        quarters: int = 0,
+        weeks: int = 0,
+        dialect: Optional[Dialects] = None,
     ):
         self.dialect = dialect
         self.largest = None
@@ -1437,9 +1458,9 @@ class Interval(Node):
             return
 
         for unit, label, value in zip(
-                self.units,
-                self.labels,
-                [years, months, days, hours, minutes, seconds, microseconds],
+            self.units,
+            self.labels,
+            [years, months, days, hours, minutes, seconds, microseconds],
         ):
             if value:
                 setattr(self, unit, int(value))
@@ -1496,7 +1517,7 @@ class Interval(Node):
 
 class Pow(Function):
     def __init__(
-            self, term: Term, exponent: float, alias: Optional[str] = None
+        self, term: Term, exponent: float, alias: Optional[str] = None
     ) -> None:
         super().__init__("POW", term, exponent, alias=alias)
 
